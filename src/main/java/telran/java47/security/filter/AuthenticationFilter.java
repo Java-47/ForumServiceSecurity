@@ -31,10 +31,8 @@ public class AuthenticationFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
-		
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-		
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 			String[] credentials;
 			try {
@@ -70,7 +68,7 @@ public class AuthenticationFilter implements Filter {
 			super(request);
 			this.login = login;
 		}
-
+		
 		@Override
 		public Principal getUserPrincipal() {
 			return () -> login;
