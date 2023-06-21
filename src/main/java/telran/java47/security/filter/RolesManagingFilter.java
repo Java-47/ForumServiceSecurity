@@ -18,40 +18,31 @@ import telran.java47.accounting.dao.UserAccountRepository;
 import telran.java47.accounting.model.UserAccount;
 
 @Component
-@Order(30)
 @RequiredArgsConstructor
-public class UserFilter implements Filter {
+@Order(20)
+public class RolesManagingFilter implements Filter {
+	
 	final UserAccountRepository userAccountRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
-
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-
-		if (request.getUserPrincipal() != null && checkEndPoint(request.getMethod(), request.getServletPath())) {
-			String LoginFromRequest = request.getServletPath().replaceAll("^.*?/user/([^/]*).*", "$1");
-
-			UserAccount userAccount = userAccountRepository.findById(request.getUserPrincipal().getName()).orElse(null);
-
-			if (userAccount.getLogin().equals(LoginFromRequest)) {
-				chain.doFilter(request, response);
-			} else if (userAccount.getRoles().contains("ADMINISTRATOR")) {
-				chain.doFilter(request, response);
+		
+		if(checkEndPoint(request.getMethod(), request.getServletPath())) {
+			UserAccount userAccount = userAccountRepository.findById(request.getUserPrincipal().getName()).get();
+			if(!userAccount.getRoles().contains("Administrator".toUpperCase())) {
+				response.sendError(403);
 				return;
-			} else {
-				response.sendError(403, "Access denied!");
 			}
-
-		} else {
-			chain.doFilter(request, response);
 		}
-	}
+		chain.doFilter(request, response);
 
+	}
+	
 	private boolean checkEndPoint(String method, String path) {
-		return ("PUT".equalsIgnoreCase(method) && path.matches("/account/user/([^/]+)/?"))
-				|| ("DELETE".equalsIgnoreCase(method) && path.matches("/account/user/([^/]+)/?"));
+		return path.matches("/account/user/\\w+/role/\\w+/?");
 	}
 
 }
