@@ -16,21 +16,19 @@ import org.springframework.stereotype.Component;
 import telran.java47.security.model.User;
 
 @Component
-@Order(40)
-public class DeleteUserFilter implements Filter {
+@Order(20)
+public class AdminManagingRolesFilter implements Filter {
+
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-		String path = request.getServletPath();
-		if (checkEndPoint(request.getMethod(), path)) {
+
+		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 			User user = (User) request.getUserPrincipal();
-			String[] arr = path.split("/");
-			String userName = arr[arr.length - 1];
-			if (!(user.getName().equalsIgnoreCase(userName)
-					|| user.getRoles().contains("Administrator".toUpperCase()))) {
+			if (!user.getRoles().contains("Administrator".toUpperCase())) {
 				response.sendError(403);
 				return;
 			}
@@ -40,7 +38,7 @@ public class DeleteUserFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return "DELETE".equalsIgnoreCase(method) && path.matches("/account/user/\\w+/?");
+		return path.matches("/account/user/\\w+/role/\\w+/?");
 	}
 
 }

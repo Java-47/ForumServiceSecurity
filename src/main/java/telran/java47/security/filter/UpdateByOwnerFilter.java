@@ -1,6 +1,7 @@
 package telran.java47.security.filter;
 
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,11 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import telran.java47.security.model.User;
-
 @Component
-@Order(40)
-public class DeleteUserFilter implements Filter {
+@Order(30)
+public class UpdateByOwnerFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -26,11 +25,10 @@ public class DeleteUserFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		String path = request.getServletPath();
 		if (checkEndPoint(request.getMethod(), path)) {
-			User user = (User) request.getUserPrincipal();
+			Principal principal = request.getUserPrincipal();
 			String[] arr = path.split("/");
-			String userName = arr[arr.length - 1];
-			if (!(user.getName().equalsIgnoreCase(userName)
-					|| user.getRoles().contains("Administrator".toUpperCase()))) {
+			String user = arr[arr.length - 1];
+			if (!principal.getName().equalsIgnoreCase(user)) {
 				response.sendError(403);
 				return;
 			}
@@ -40,7 +38,9 @@ public class DeleteUserFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return "DELETE".equalsIgnoreCase(method) && path.matches("/account/user/\\w+/?");
+		return "PUT".equalsIgnoreCase(method) && path.matches("/account/user/\\w+/?")
+				|| "POST".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?")
+				|| "PUT".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/comment/\\w+/?");
 	}
 
 }

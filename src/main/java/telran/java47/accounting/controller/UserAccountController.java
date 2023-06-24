@@ -35,9 +35,6 @@ public class UserAccountController {
 
 	@PostMapping("/login")
 	public UserDto login(Principal principal) {
-//		if(principal == null) {
-//			
-//		}
 		return userAccountService.getUser(principal.getName());
 	}
 
