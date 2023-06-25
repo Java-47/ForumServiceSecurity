@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import telran.java47.ENUMS.Roles;
 import telran.java47.security.model.User;
 
 @Component
@@ -28,7 +29,7 @@ public class AdminManagingRolesFilter implements Filter {
 
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 			User user = (User) request.getUserPrincipal();
-			if (!user.getRoles().contains("Administrator".toUpperCase())) {
+			if (!user.getRoles().contains(Roles.ADMINISTRATOR)) {
 				response.sendError(403);
 				return;
 			}

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Component
 @Order(30)
@@ -38,7 +39,7 @@ public class UpdateUserByOwnerFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return "PUT".equalsIgnoreCase(method) && path.matches("/account/user/\\w+/?");
+		return RequestMethod.PUT.name().equalsIgnoreCase(method) && path.matches("/account/user/\\w+/?");
 	}
 
 }

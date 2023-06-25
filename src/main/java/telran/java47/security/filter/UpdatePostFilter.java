@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.RequiredArgsConstructor;
 import telran.java47.post.dao.PostRepository;
@@ -46,7 +47,7 @@ public class UpdatePostFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return "PUT".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?");
+		return RequestMethod.PUT.name().equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?");
 	}
 
 

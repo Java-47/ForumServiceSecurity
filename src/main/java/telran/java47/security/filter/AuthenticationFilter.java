@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,9 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.RequiredArgsConstructor;
+import telran.java47.ENUMS.Roles;
 import telran.java47.accounting.dao.UserAccountRepository;
 import telran.java47.accounting.model.UserAccount;
 import telran.java47.security.context.SecurityContext;
@@ -43,7 +47,7 @@ public class AuthenticationFilter implements Filter {
 			if(user == null) {
 				String[] credentials;
 				try {
-					credentials = getCredentials(request.getHeader("Authorization"));
+					credentials = getCredentials(request.getHeader(HttpHeaders.AUTHORIZATION));
 				} catch (Exception e) {
 					response.sendError(401, "token not valid");
 					return;
@@ -64,7 +68,7 @@ public class AuthenticationFilter implements Filter {
 
 	private boolean checkEndPoint(String method, String path) {
 		return !(
-				("POST".equalsIgnoreCase(method) && path.matches("/account/register/?"))
+				(RequestMethod.POST.name().equalsIgnoreCase(method) && path.matches("/account/register/?"))
 				|| path.matches("/forum/posts/\\w+(/\\w+)?/?")
 				);
 	}
@@ -79,10 +83,12 @@ public class AuthenticationFilter implements Filter {
 		String login;
 		Set<String> roles;
 
-		public WrappedRequest(HttpServletRequest request, String login, Set<String> roles) {
+		public WrappedRequest(HttpServletRequest request, String login, Set<Roles> roles) {
 			super(request);
 			this.login = login;
-			this.roles = roles;
+			this.roles = roles.stream()
+	                .map(Roles::name)
+	                .collect(Collectors.toSet());
 		}
 		
 		@Override

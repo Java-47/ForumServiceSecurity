@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.RequiredArgsConstructor;
+import telran.java47.ENUMS.Roles;
 import telran.java47.accounting.dao.UserAccountRepository;
 import telran.java47.accounting.model.UserAccount;
 import telran.java47.post.dao.PostRepository;
@@ -43,7 +45,7 @@ public class AddDeleteUpdatePostFilter implements Filter {
 				UserAccount userAccount = userAccountRepository.findById(principal.getName()).get();
 				Post post = postRepository.findById(postIdOrAuthor).orElseThrow(() -> new PostNotFoundException());
 				if (!(principal.getName().equalsIgnoreCase(post.getAuthor())
-						|| userAccount.getRoles().contains("Moderator".toUpperCase()))) {
+						|| userAccount.getRoles().contains(Roles.MODERATOR.name()))) {
 					response.sendError(403);
 					return;
 				}
@@ -52,7 +54,7 @@ public class AddDeleteUpdatePostFilter implements Filter {
 		else if ("POST".equalsIgnoreCase(request.getMethod())) {
 			UserAccount userAccount = userAccountRepository.findById(principal.getName()).get();
 			if (!(principal.getName().equalsIgnoreCase(postIdOrAuthor)
-					|| userAccount.getRoles().contains("Moderator".toUpperCase()))) {
+					|| userAccount.getRoles().contains(Roles.MODERATOR.name()))) {
 				response.sendError(403);
 				return;
 			}
@@ -62,9 +64,9 @@ public class AddDeleteUpdatePostFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return (("DELETE".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?"))
-				|| ("POST".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?"))
-				|| ("PUT".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?")));
+		return ((RequestMethod.DELETE.name().equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?"))
+				|| (RequestMethod.POST.name().equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?"))
+				|| (RequestMethod.PUT.name().equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/?")));
 	}
 
 }

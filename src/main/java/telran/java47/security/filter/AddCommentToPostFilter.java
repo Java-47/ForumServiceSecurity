@@ -12,13 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.RequiredArgsConstructor;
+import telran.java47.ENUMS.Roles;
 import telran.java47.accounting.dao.UserAccountRepository;
 import telran.java47.accounting.model.UserAccount;
 import telran.java47.post.dao.PostRepository;
 import telran.java47.post.dto.exceptions.PostNotFoundException;
-import telran.java47.post.model.Post;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class AddCommentToPostFilter implements Filter {
 			UserAccount userAccount = userAccountRepository.findById(principal.getName()).get();
 			postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException());
 			if (!(principal.getName().equalsIgnoreCase(Author)
-					|| userAccount.getRoles().contains("Moderator".toUpperCase()))) {
+					|| userAccount.getRoles().contains(Roles.MODERATOR.name()))) {
 				response.sendError(403);
 				return;
 			}
@@ -55,7 +56,7 @@ public class AddCommentToPostFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return ("PUT".equalsIgnoreCase(method) && path.matches("/forum/post/\\w+/comment/\\w+/?"));
+		return (RequestMethod.PUT.name().equals(method) && path.matches("/forum/post/\\w+/comment/\\w+/?"));
 	}
 
 }

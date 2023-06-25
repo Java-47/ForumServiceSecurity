@@ -14,6 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import telran.java47.ENUMS.Roles;
 import telran.java47.accounting.dao.UserAccountRepository;
 import telran.java47.accounting.model.UserAccount;
 
@@ -32,7 +33,7 @@ public class RolesManagingFilter implements Filter {
 		
 		if(checkEndPoint(request.getMethod(), request.getServletPath())) {
 			UserAccount userAccount = userAccountRepository.findById(request.getUserPrincipal().getName()).get();
-			if(!userAccount.getRoles().contains("Administrator".toUpperCase())) {
+			if(!userAccount.getRoles().contains(Roles.ADMINISTRATOR.name())) {
 				response.sendError(403);
 				return;
 			}
